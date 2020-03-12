@@ -15,17 +15,7 @@ server.on('connection', (client) => {
   // Handle receiving file requests from client
   client.on('data', (fileName) => {
     console.log('Received request for file: ', fileName);
-    fileName = fileName.trim();
-    // fs.access(fileName, fs.constants.F_OK, (error) => {
-    //   //console.log('ERROR', err);
-    //   //console.log(`${fileName} ${err ? 'does not exist' : 'exists'}`);
-    //   if (error && error.code==='ENOENT') {
-    //     client.write("Sorry, file doesn't exist!");
-    //   } else {
-    //     client.write("Sending file...");
-    //     //TODO
-    //   }
-    // });
+    fileName = fileName.trim(); // Must trim out newline character
     fs.readFile(fileName, (error, data) => {
       if (error && error.code === 'ENOENT') {
         client.write("Sorry, file doesn't exist!");
@@ -33,7 +23,7 @@ server.on('connection', (client) => {
         client.write('Sorry, an unknown error occurred!');
       } else {
         console.log(`Sending ${fileName} to client...`);
-        client.write("Sending file...");
+        client.write(`${fileName}\n`);
         client.write(data);
         //TODO
       }
