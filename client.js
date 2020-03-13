@@ -1,11 +1,13 @@
 const net = require('net');
 const stdin = process.stdin; // Handles input for requesting
+const fs = require('fs');
+const EOF = 'THEFILEHASENDED';
 
-let requestedFile;
-let awaitingFile = false;
+let requestedFile; // Stores filename being requested
+let awaitingFile = false; // Stores whether server is about to send the file
 const conn = net.createConnection({
   host: 'localhost', // change to IP address
-  port: 3000
+  port: 3000,
 });
 
 conn.setEncoding('utf8'); // interpret data as text
@@ -17,23 +19,23 @@ conn.on('connect', () => {
 
 // Handles receiving data
 conn.on('data', (data) => {
-  //console.log('Requested file: ', requestedFile);
-  //console.log('Returned data: ', data.trim());
-  //console.log('requested = returned? ', data.trim() === requestedFile);
+  if (awaitingFile) {
+    fs.writeFile(`saved/${requestedFile}`, data, 'binary', () => {
+      console.log(`Received ${requestedFile}!`);
+    });
+    awaitingFile = false;
 
-  if (requestedFile && (data.trim() == requestedFile)) {
+    // Server will send a message with just the filename just prior to 
+    // sending the actual data
+  } else if (requestedFile && (data.trim() == requestedFile)) {
     console.log('Server about to send us the file!');
     awaitingFile = true;
-  } else if (awaitingFile) {
-    console.log('Here is our data: ', data);
-    awaitingFile = false;
   } else {
     console.log('Server says: ', data);
   }
 });
 
 stdin.on('data', (input) => {
-  //console.log("Requested: ", input);
   requestedFile = input.trim();
   conn.write(input);
 });

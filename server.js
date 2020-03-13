@@ -1,6 +1,8 @@
 const net = require('net');
 const fs = require('fs');
+const EOF = 'THEFILEHASENDED';
 const server = net.createServer();
+
 
 server.listen(3000);
 // , () => {
@@ -16,19 +18,22 @@ server.on('connection', (client) => {
   client.on('data', (fileName) => {
     console.log('Received request for file: ', fileName);
     fileName = fileName.trim(); // Must trim out newline character
-    fs.readFile(fileName, (error, data) => {
+
+    fs.readFile(fileName, 'binary', (error, data) => {
       if (error && error.code === 'ENOENT') {
         client.write("Sorry, file doesn't exist!");
       } else if (error) {
         client.write('Sorry, an unknown error occurred!');
       } else {
         console.log(`Sending ${fileName} to client...`);
+
+        // Send the filename so client knows file is coming
         client.write(`${fileName}\n`);
-        client.write(data);
-        //TODO
+
+        // Send the file itself
+        setTimeout(() => { client.write(data); }, 1000);
       }
     });
-    //console.log(fileName);
   });
 
   client.on('end', () => {
