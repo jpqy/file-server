@@ -1,6 +1,6 @@
 const net = require('net');
 const fs = require('fs');
-const EOF = 'THEFILEHASENDED';
+const EOF = '\nTHEFILEHASENDED';
 const server = net.createServer();
 
 
@@ -28,10 +28,14 @@ server.on('connection', (client) => {
         console.log(`Sending ${fileName} to client...`);
 
         // Send the filename so client knows file is coming
-        client.write(`${fileName}\n`);
+        client.write(`${fileName}\n`, () => {
+          client.write(data, () => {
+            setTimeout(() => client.write(EOF), 500);
+          });
+        });
 
         // Send the file itself
-        setTimeout(() => { client.write(data); }, 1000);
+        //setTimeout(() => { client.write(data); }, 1000);
       }
     });
   });
