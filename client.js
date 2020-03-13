@@ -14,18 +14,19 @@ const conn = net.createConnection({
 conn.setEncoding('utf8'); // interpret data as text
 stdin.setEncoding('utf8'); // interpret data as text
 
-conn.on('connect', () => {
-  //conn.write('Hello from client!');
-});
-
 // Handles receiving data
 conn.on('data', (data) => {
-  //console.log('data ',data);
-  //console.log('eof ', EOF);
 
   // Initial buffer, write file
   if (awaitingFile) {
-    fs.writeFileSync(`saved/${requestedFile}`, data, 'binary', () => {
+
+    // Make downloads directory if it doesn't exist
+    const dir = __dirname + '/downloads';
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, 0744);
+    }
+
+    fs.writeFileSync(`downloads/${requestedFile}`, data, 'binary', () => {
       console.log(`Receiving ${requestedFile}...`);
     });
     awaitingFile = false;
