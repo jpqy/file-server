@@ -37,7 +37,7 @@ conn.on('data', (data) => {
     console.log(`Received ${requestedFile}!`);
   } else if (transferring) {
     // Transfer in progress, append file
-    fs.appendFileSync(`saved/${requestedFile}`, data, 'binary', () => {
+    fs.appendFileSync(`downloads/${requestedFile}`, data, 'binary', () => {
       console.log(`Still receiving ${requestedFile}...`);
     });
 
