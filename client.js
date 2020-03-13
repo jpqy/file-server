@@ -2,12 +2,13 @@ const net = require('net');
 const stdin = process.stdin; // Handles input for requesting
 const fs = require('fs');
 const EOF = 'THEFILEHASENDED';
+const serverIP = 'localhost';
 
 let requestedFile; // Stores filename being requested
 let awaitingFile = false; // Stores whether server is about to send the file
 let transferring = false;
 const conn = net.createConnection({
-  host: 'localhost', // change to IP address
+  host: serverIP, // change to IP address
   port: 3000,
 });
 
